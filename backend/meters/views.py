@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Meter
 from .serializers import MeterSerializer, MeterCreateSerializer, MeterUpdateSerializer
+from ingufupay.pagination import StandardPagination  # ✅ added
 
 
 class MeterListCreateView(APIView):
@@ -13,8 +14,10 @@ class MeterListCreateView(APIView):
     def get(self, request):
         """GET /api/meters/ — list authenticated user's meters"""
         meters = Meter.objects.filter(owner=request.user)
-        serializer = MeterSerializer(meters, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = StandardPagination()                          # ✅ added
+        result = paginator.paginate_queryset(meters, request)     # ✅ added
+        serializer = MeterSerializer(result, many=True)           # ✅ result not meters
+        return paginator.get_paginated_response(serializer.data)  # ✅ added
 
     def post(self, request):
         """POST /api/meters/ — register a new meter"""
