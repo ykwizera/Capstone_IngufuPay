@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Notification
 from .serializers import NotificationSerializer
-from ingufupay.pagination import StandardPagination  # ✅ added
+from ingufupay.pagination import StandardPagination
 
 
 class NotificationListView(APIView):
@@ -13,30 +13,27 @@ class NotificationListView(APIView):
     def get(self, request):
         qs = Notification.objects.filter(user=request.user)
 
-        # ✅ robust is_read filter
         is_read = request.query_params.get("is_read")
         if is_read is not None:
             val = is_read.strip().lower()
-            truthy = {"true", "1", "yes", "y"}
-            falsy = {"false", "0", "no", "n"}
-            if val in truthy:
+            if val in {"true", "1", "yes"}:
                 qs = qs.filter(is_read=True)
-            elif val in falsy:
+            elif val in {"false", "0", "no"}:
                 qs = qs.filter(is_read=False)
 
-        paginator = StandardPagination()
-        result = paginator.paginate_queryset(qs, request)
+        paginator  = StandardPagination()
+        result     = paginator.paginate_queryset(qs, request)
         serializer = NotificationSerializer(result, many=True)
-        response = paginator.get_paginated_response(serializer.data)
+        response   = paginator.get_paginated_response(serializer.data)
 
-        # ✅ inject unread count for frontend badge
         response.data["unread_count"] = Notification.objects.filter(
             user=request.user, is_read=False
         ).count()
         return response
 
 
-class NotificationMarkReadView(APIView):
+class NotificationDetailView(APIView):
+    """PATCH /api/notifications/<id>/ — mark read or unread"""
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
@@ -47,22 +44,33 @@ class NotificationMarkReadView(APIView):
                 {"detail": "Notification not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
-        notification.is_read = True
-        notification.save(update_fields=["is_read", "updated_at"])  # ✅ track when read
-        return Response({"detail": "Marked as read."}, status=status.HTTP_200_OK)
+
+        is_read = request.data.get("is_read")
+        if is_read is None:
+            return Response(
+                {"detail": "is_read field is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        notification.is_read = bool(is_read)
+        notification.save(update_fields=["is_read"])
+        serializer = NotificationSerializer(notification)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class NotificationMarkAllReadView(APIView):
+    """POST /api/notifications/mark-all-read/ — mark all as read"""
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request):
+    def post(self, request):
         updated = Notification.objects.filter(
             user=request.user, is_read=False
         ).update(is_read=True)
         return Response(
-            {
-                "detail": "All notifications marked as read.",
-                "updated_count": updated  # ✅ how many were updated
-            },
+            {"detail": "All notifications marked as read.", "updated_count": updated},
             status=status.HTTP_200_OK
         )
+
+    # Also support PATCH in case frontend uses it
+    def patch(self, request):
+        return self.post(request)

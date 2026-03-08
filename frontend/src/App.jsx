@@ -5,6 +5,7 @@ import Layout from "./components/Layout"
 
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import VerifyEmail from "./pages/VerifyEmail"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 import Dashboard from "./pages/Dashboard"
@@ -22,11 +23,12 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/"                element={<Navigate to="/login" />} />
+          <Route path="/login"           element={<Login />} />
+          <Route path="/register"        element={<Register />} />
+          <Route path="/verify-email"    element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password"  element={<ResetPassword />} />
 
           {/* Protected routes — wrapped in Layout */}
           <Route
@@ -36,14 +38,14 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/dashboard"      element={<Dashboard />} />
-            <Route path="/meters"         element={<Meters />} />
-            <Route path="/meters/:id"     element={<MeterDetail />} />
-            <Route path="/buy-token"      element={<BuyToken />} />
-            <Route path="/transactions"   element={<Transactions />} />
-            <Route path="/notifications"  element={<Notifications />} />
-            <Route path="/profile"        element={<Profile />} />
-            <Route path="/support"        element={<Support />} />
+            <Route path="/dashboard"     element={<Dashboard />} />
+            <Route path="/meters"        element={<Meters />} />
+            <Route path="/meters/:id"    element={<MeterDetail />} />
+            <Route path="/buy-token"     element={<BuyToken />} />
+            <Route path="/transactions"  element={<Transactions />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/profile"       element={<Profile />} />
+            <Route path="/support"       element={<Support />} />
           </Route>
 
           {/* Catch all */}

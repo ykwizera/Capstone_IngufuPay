@@ -6,29 +6,37 @@ import "./PasswordReset.css"
 export default function ResetPassword() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    email: "",
-    otp: "",
-    new_password: "",
+    email: "", otp: "", new_password: "", confirm_password: ""
   })
-  const [error, setError] = useState("")
+  const [error, setError]     = useState("")
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+
+    if (form.new_password !== form.confirm_password) {
+      return setError("Passwords do not match.")
+    }
+    if (form.new_password.length < 8) {
+      return setError("Password must be at least 8 characters.")
+    }
+
     setLoading(true)
     try {
-      await api.post("/auth/password-reset/confirm/", form)
+      await api.post("/auth/password-reset/confirm/", {
+        email:        form.email,
+        otp:          form.otp,
+        new_password: form.new_password,
+      })
       navigate("/login")
     } catch (err) {
       const data = err.response?.data
       if (data) {
-        const firstError = Object.values(data)[0]
-        setError(Array.isArray(firstError) ? firstError[0] : firstError)
+        const first = Object.values(data).flat()[0]
+        setError(typeof first === "string" ? first : "Something went wrong.")
       } else {
         setError("Something went wrong. Please try again.")
       }
@@ -41,7 +49,7 @@ export default function ResetPassword() {
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-logo">IngufuPay</h1>
-        <h2 className="auth-title">Reset password</h2>
+        <h2 className="auth-title">Reset Password</h2>
         <p className="auth-subtitle">Enter the OTP sent to your email</p>
 
         {error && <div className="auth-error">{error}</div>}
@@ -81,13 +89,24 @@ export default function ResetPassword() {
               required
             />
           </div>
+          <div className="form-group">
+            <label>Confirm New Password</label>
+            <input
+              type="password"
+              name="confirm_password"
+              value={form.confirm_password}
+              onChange={handleChange}
+              placeholder="Repeat new password"
+              required
+            />
+          </div>
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? "Resetting..." : "Reset Password"}
           </button>
         </form>
 
         <p className="auth-link">
-          <Link to="/forgot-password">← Request a new OTP</Link>
+          <Link to="/forgot-password">Request a new OTP</Link>
         </p>
         <p className="auth-link">
           <Link to="/login">Back to Sign in</Link>

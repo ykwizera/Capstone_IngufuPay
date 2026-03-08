@@ -5,104 +5,86 @@ import api from "../api/axios"
 import TokenCard from "../components/TokenCard"
 import "./BuyToken.css"
 
-function genToken() {
-  return Array.from({ length: 4 }, () =>
-    Math.floor(10000 + Math.random() * 90000)
-  ).join("-")
-}
-
 export default function BuyToken() {
   const navigate = useNavigate()
 
-  const [meters, setMeters]       = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [selected, setSelected]   = useState({})
-  const [method, setMethod]       = useState("momo")
-  const [tokens, setTokens]       = useState([])
+  const [meters, setMeters]         = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [selected, setSelected]     = useState({})
+  const [method, setMethod]         = useState("momo")
+  const [tokens, setTokens]         = useState([])
   const [purchasing, setPurchasing] = useState(false)
+  const [error, setError]           = useState("")
 
   useEffect(() => {
     api.get("/meters/")
       .then(res => {
         const all = res.data.results ?? res.data
-        setMeters(all.filter(m => m.status !== "disabled"))
+        setMeters(all.filter(m => m.status !== "disabled" && m.status !== "inactive"))
       })
-      .catch(err => {
-        if (err.response?.status === 401) navigate("/login")
-      })
+      .catch(err => { if (err.response?.status === 401) navigate("/login") })
       .finally(() => setLoading(false))
   }, [navigate])
 
-  // Toggle meter selection
   const toggleMeter = (meter) => {
     setSelected(prev => {
       const next = { ...prev }
-      if (next[meter.id]) {
-        delete next[meter.id]
-      } else {
-        next[meter.id] = {
-          name:          meter.name,
-          meter_number:  meter.meter_number,
-          amount:        "",
-        }
+      if (next[meter.id]) delete next[meter.id]
+      else next[meter.id] = {
+        name:         meter.name,
+        meter_number: meter.meter_number,
+        amount:       "",
       }
       return next
     })
   }
 
-  // Update amount for a selected meter
   const setAmount = (id, amount) => {
-    setSelected(prev => ({
-      ...prev,
-      [id]: { ...prev[id], amount }
-    }))
+    setSelected(prev => ({ ...prev, [id]: { ...prev[id], amount } }))
   }
 
-  // Only meters with amount >= 100 are valid for purchase
   const validItems = Object.entries(selected).filter(
     ([, v]) => parseFloat(v.amount) >= 100
   )
   const total = validItems.reduce((sum, [, v]) => sum + parseFloat(v.amount), 0)
 
-  const methodLabels = {
-    momo: "Mobile Money",
-    card: "Card",
-    cash: "Cash",
-  }
+  const methodLabels = { momo: "Mobile Money", card: "Card", cash: "Cash" }
 
   const handlePurchase = async () => {
     if (!validItems.length) return
     setPurchasing(true)
+    setError("")
     try {
-      // Replace with real API calls when ready:
-      // const results = await Promise.all(
-      //   validItems.map(([id, v]) =>
-      //     api.post("/transactions/", {
-      //       meter: id,
-      //       amount_rwf: v.amount,
-      //       payment_method: method,
-      //     })
-      //   )
-      // )
-      const results = validItems.map(([, v]) => ({
-        token:        genToken(),
-        units:        (parseFloat(v.amount) / 100).toFixed(3),
-        amount:       v.amount,
-        meterName:    v.name,
-        meterNumber:  v.meter_number,
-      }))
+      const results = await Promise.all(
+        validItems.map(async ([id, v]) => {
+          const { data } = await api.post("/transactions/purchase-token/", {
+            meter:      parseInt(id),
+            amount_rwf: parseFloat(v.amount),
+            method:     method,
+          })
+          return {
+            token:       data.token,
+            units:       data.units,
+            amount:      v.amount,
+            meterName:   v.name,
+            meterNumber: v.meter_number,
+          }
+        })
+      )
       setTokens(results)
-    } catch {
-      alert("Purchase failed. Please try again.")
+    } catch (err) {
+      const msg = err.response?.data
+      setError(
+        typeof msg === "object"
+          ? Object.values(msg).flat()[0]
+          : "Purchase failed. Please try again."
+      )
     } finally {
       setPurchasing(false)
     }
   }
 
-  const reset = () => {
-    setSelected({})
-    setTokens([])
-  }
+  const reset = () => { setSelected({}); setTokens([]); setError("") }
 
   if (loading) return (
     <div className="page">
@@ -114,14 +96,11 @@ export default function BuyToken() {
     </div>
   )
 
-  // Token success screen
   if (tokens.length > 0) {
     return (
       <div className="page page-enter">
         <div className="bt-success">
-          <div className="bt-success-icon">
-            <Check size={28} />
-          </div>
+          <div className="bt-success-icon"><Check size={28} /></div>
           <div className="bt-success-title">
             {tokens.length} Token{tokens.length > 1 ? "s" : ""} Generated!
           </div>
@@ -129,7 +108,6 @@ export default function BuyToken() {
             Enter each token on your electricity meter device
           </div>
         </div>
-
         <div className="bt-tokens-list">
           {tokens.map((t, i) => (
             <TokenCard
@@ -142,7 +120,6 @@ export default function BuyToken() {
             />
           ))}
         </div>
-
         <button className="btn btn-secondary" onClick={reset}>
           <RefreshCw size={14} /> Buy Another Token
         </button>
@@ -160,15 +137,12 @@ export default function BuyToken() {
       </div>
 
       <div className="bt-layout">
-
-        {/* Left — steps */}
         <div className="bt-steps">
 
-          {/* Step 1 — Select meters */}
+          {/* Step 1 */}
           <div className="bt-card">
             <div className="bt-card-title">
-              <span className="step-num">1</span>
-              Select Meters
+              <span className="step-num">1</span> Select Meters
             </div>
             {meters.length === 0 ? (
               <div className="bt-no-meters">
@@ -187,9 +161,7 @@ export default function BuyToken() {
                       className={`meter-sel-card${isSel ? " sel" : ""}${m.is_low_balance ? " sel-low" : ""}`}
                       onClick={() => toggleMeter(m)}
                     >
-                      {isSel && (
-                        <div className="sel-check"><Check size={11} /></div>
-                      )}
+                      {isSel && <div className="sel-check"><Check size={11} /></div>}
                       <div className="msc-name">
                         {m.name}
                         {m.is_low_balance && (
@@ -207,12 +179,11 @@ export default function BuyToken() {
             )}
           </div>
 
-          {/* Step 2 — Enter amounts */}
+          {/* Step 2 */}
           {Object.keys(selected).length > 0 && (
             <div className="bt-card">
               <div className="bt-card-title">
-                <span className="step-num">2</span>
-                Enter Amounts
+                <span className="step-num">2</span> Enter Amounts
               </div>
               <div className="bulk-rows">
                 {Object.entries(selected).map(([id, v]) => (
@@ -243,12 +214,11 @@ export default function BuyToken() {
             </div>
           )}
 
-          {/* Step 3 — Payment method */}
+          {/* Step 3 */}
           {Object.keys(selected).length > 0 && (
             <div className="bt-card">
               <div className="bt-card-title">
-                <span className="step-num">3</span>
-                Payment Method
+                <span className="step-num">3</span> Payment Method
               </div>
               <div className="fg">
                 <label>Pay with</label>
@@ -260,12 +230,12 @@ export default function BuyToken() {
               </div>
             </div>
           )}
+
         </div>
 
-        {/* Right — Order summary */}
+        {/* Order summary */}
         <div className="summary-card">
           <div className="sum-title">Order Summary</div>
-
           {validItems.length === 0 ? (
             <div className="sum-empty">
               <ShoppingCart size={28} />
@@ -289,12 +259,15 @@ export default function BuyToken() {
                   </div>
                 ))}
               </div>
-
               <div className="sum-total">
                 <span>Total</span>
                 <span>{total.toLocaleString()} RWF</span>
               </div>
-
+              {error && (
+                <div style={{ color: "var(--danger)", fontSize: "0.8rem", marginTop: "0.75rem" }}>
+                  {error}
+                </div>
+              )}
               <button
                 className="btn btn-primary"
                 style={{ width: "100%", marginTop: "1rem", padding: "0.875rem" }}
@@ -309,7 +282,6 @@ export default function BuyToken() {
             </>
           )}
         </div>
-
       </div>
     </div>
   )

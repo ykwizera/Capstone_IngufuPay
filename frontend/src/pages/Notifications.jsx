@@ -19,11 +19,10 @@ export default function Notifications() {
     else setLoading(true)
     setError(null)
     try {
-      const res = await api.get("/notifications/")
+      const res  = await api.get("/notifications/")
       const data = res.data.results ?? res.data
       setNotifications(data)
-      const unread = data.filter(n => !n.is_read).length
-      setUnreadCount(unread)
+      setUnreadCount(res.data.unread_count ?? data.filter(n => !n.is_read).length)
     } catch (err) {
       if (err.response?.status === 401) navigate("/login")
       else setError("Failed to load notifications.")
@@ -35,7 +34,6 @@ export default function Notifications() {
 
   useEffect(() => { fetchNotifications() }, [fetchNotifications])
 
-  // Mark single notification as read
   const markRead = async (id) => {
     try {
       await api.patch(`/notifications/${id}/`, { is_read: true })
@@ -49,7 +47,6 @@ export default function Notifications() {
     }
   }
 
-  // Mark single notification as unread
   const markUnread = async (id) => {
     try {
       await api.patch(`/notifications/${id}/`, { is_read: false })
@@ -63,21 +60,18 @@ export default function Notifications() {
     }
   }
 
-  // Mark all as read
   const markAllRead = async () => {
     try {
       await api.post("/notifications/mark-all-read/")
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
       setUnreadCount(0)
     } catch {
-      // Fallback — mark individually
       await Promise.all(
         notifications.filter(n => !n.is_read).map(n => markRead(n.id))
       )
     }
   }
 
-  // Mark all as unread
   const markAllUnread = async () => {
     try {
       await Promise.all(
@@ -94,12 +88,10 @@ export default function Notifications() {
 
   const unreadCount = notifications.filter(n => !n.is_read).length
 
-  // Notification type styling
   const getNotifStyle = (notif) => {
     if (notif.is_read) return {}
-    if (notif.notification_type === "low_balance") {
+    if (notif.notification_type === "low_balance")
       return { borderLeft: "3px solid var(--warning)", background: "var(--warning-light)" }
-    }
     return { borderLeft: "3px solid var(--primary)", background: "var(--primary-light)" }
   }
 
@@ -112,9 +104,9 @@ export default function Notifications() {
   const formatTime = (dateStr) => {
     if (!dateStr) return ""
     const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
-    if (diff < 60)   return "Just now"
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-    if (diff < 86400)return `${Math.floor(diff / 3600)}h ago`
+    if (diff < 60)    return "Just now"
+    if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
     return `${Math.floor(diff / 86400)}d ago`
   }
 
@@ -125,9 +117,7 @@ export default function Notifications() {
           <div className="page-title">Notifications</div>
           <div className="page-sub">
             {loading ? "Loading..." : unreadCount > 0
-              ? `${unreadCount} unread`
-              : "All caught up"
-            }
+              ? `${unreadCount} unread` : "All caught up"}
           </div>
         </div>
         <button
@@ -140,7 +130,6 @@ export default function Notifications() {
         </button>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="notif-error">
           <WifiOff size={15} /> {error}
@@ -150,7 +139,6 @@ export default function Notifications() {
         </div>
       )}
 
-      {/* Bulk actions */}
       {!loading && notifications.length > 0 && (
         <div className="notif-bar">
           <button className="btn btn-secondary btn-sm" onClick={markAllRead}>
@@ -162,7 +150,6 @@ export default function Notifications() {
         </div>
       )}
 
-      {/* Loading skeleton */}
       {loading ? (
         <div className="notif-list">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -192,10 +179,7 @@ export default function Notifications() {
               className={`notif-item${n.is_read ? "" : " unread"}`}
               style={getNotifStyle(n)}
             >
-              <div
-                className="notif-dot"
-                style={{ background: getDotColor(n) }}
-              />
+              <div className="notif-dot" style={{ background: getDotColor(n) }} />
               <div className="notif-body">
                 <div className="notif-title">{n.title}</div>
                 <div className="notif-msg">{n.message}</div>
@@ -203,17 +187,11 @@ export default function Notifications() {
               </div>
               <div className="notif-actions">
                 {n.is_read ? (
-                  <button
-                    className="btn btn-secondary btn-xs"
-                    onClick={() => markUnread(n.id)}
-                  >
+                  <button className="btn btn-secondary btn-xs" onClick={() => markUnread(n.id)}>
                     Mark unread
                   </button>
                 ) : (
-                  <button
-                    className="btn btn-secondary btn-xs"
-                    onClick={() => markRead(n.id)}
-                  >
+                  <button className="btn btn-secondary btn-xs" onClick={() => markRead(n.id)}>
                     Mark read
                   </button>
                 )}

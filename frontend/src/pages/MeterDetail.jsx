@@ -5,15 +5,9 @@ import api from "../api/axios"
 import TokenCard from "../components/TokenCard"
 import "./MeterDetail.css"
 
-function genToken() {
-  return Array.from({ length: 4 }, () =>
-    Math.floor(10000 + Math.random() * 90000)
-  ).join("-")
-}
-
 export default function MeterDetail() {
-  const { id }    = useParams()
-  const navigate  = useNavigate()
+  const { id }   = useParams()
+  const navigate = useNavigate()
 
   const [meter, setMeter]           = useState(null)
   const [transactions, setTxs]      = useState([])
@@ -23,11 +17,11 @@ export default function MeterDetail() {
   const [method, setMethod]         = useState("momo")
   const [purchased, setPurchased]   = useState(null)
   const [purchasing, setPurchasing] = useState(false)
+  const [purchaseError, setPurchaseError] = useState("")
 
   useEffect(() => {
     const fetchAll = async () => {
-      setLoading(true)
-      setError(null)
+      setLoading(true); setError(null)
       try {
         const [mRes, tRes] = await Promise.all([
           api.get(`/meters/${id}/`),
@@ -38,9 +32,7 @@ export default function MeterDetail() {
       } catch (err) {
         if (err.response?.status === 401) navigate("/login")
         else setError("Failed to load meter details.")
-      } finally {
-        setLoading(false)
-      }
+      } finally { setLoading(false) }
     }
     fetchAll()
   }, [id, navigate])
@@ -48,19 +40,28 @@ export default function MeterDetail() {
   const handlePurchase = async () => {
     if (!amount || parseFloat(amount) < 100) return
     setPurchasing(true)
+    setPurchaseError("")
     try {
-      // Replace genToken() with real API call when ready:
-      // const { data } = await api.post("/transactions/", {
-      //   meter: id, amount_rwf: amount, payment_method: method
-      // })
-      const units = (parseFloat(amount) / 100).toFixed(3)
-      const token = genToken()
-      setPurchased({ token, units, amount })
-    } catch {
-      alert("Purchase failed. Please try again.")
-    } finally {
-      setPurchasing(false)
-    }
+      const { data } = await api.post("/transactions/purchase-token/", {
+        meter:      parseInt(id),
+        amount_rwf: parseFloat(amount),
+        method:     method,
+      })
+      setPurchased({
+        token:  data.token,
+        units:  data.units,
+        amount: amount,
+      })
+      // Update meter balance in UI
+      setMeter(prev => ({ ...prev, current_balance_units: data.new_balance_units }))
+    } catch (err) {
+      const msg = err.response?.data
+      setPurchaseError(
+        typeof msg === "object"
+          ? Object.values(msg).flat()[0]
+          : "Purchase failed. Please try again."
+      )
+    } finally { setPurchasing(false) }
   }
 
   if (loading) return (
@@ -105,10 +106,7 @@ export default function MeterDetail() {
     <div className="page page-enter">
       <div className="page-header">
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={() => navigate("/meters")}
-          >
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate("/meters")}>
             <ArrowLeft size={14} /> Back
           </button>
           <div>
@@ -123,9 +121,8 @@ export default function MeterDetail() {
 
       <div className="detail-grid">
 
-        {/* Left column */}
+        {/* Left */}
         <div>
-          {/* Balance card */}
           <div className="card" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
             <div className="big-bal">
               <div className="big-bal-label">Current Balance</div>
@@ -139,22 +136,16 @@ export default function MeterDetail() {
             )}
           </div>
 
-          {/* Meter info */}
           <div className="card" style={{ padding: "1.25rem" }}>
             <div className="detail-section-title">Meter Info</div>
             <div className="detail-row">
               <span className="detail-key">Number</span>
-              <span className="detail-val mono" style={{ fontSize: "0.78rem" }}>
-                {meter.meter_number}
-              </span>
+              <span className="detail-val mono" style={{ fontSize: "0.78rem" }}>{meter.meter_number}</span>
             </div>
             <div className="detail-row">
               <span className="detail-key">Location</span>
               <span className="detail-val" style={{ display: "flex", alignItems: "center", gap: "0.3rem" }}>
-                {meter.location
-                  ? <><MapPin size={12} />{meter.location}</>
-                  : "—"
-                }
+                {meter.location ? <><MapPin size={12} />{meter.location}</> : "—"}
               </span>
             </div>
             <div className="detail-row">
@@ -168,12 +159,10 @@ export default function MeterDetail() {
           </div>
         </div>
 
-        {/* Right column */}
+        {/* Right */}
         <div>
-          {/* Purchase card */}
           <div className="card" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
             <div className="detail-section-title">Purchase Token</div>
-
             {purchased ? (
               <>
                 <TokenCard
@@ -186,7 +175,7 @@ export default function MeterDetail() {
                 <button
                   className="btn btn-secondary"
                   style={{ width: "100%", marginTop: "0.5rem" }}
-                  onClick={() => { setPurchased(null); setAmount("") }}
+                  onClick={() => { setPurchased(null); setAmount(""); setPurchaseError("") }}
                 >
                   Purchase Again
                 </button>
@@ -203,9 +192,7 @@ export default function MeterDetail() {
                     onChange={e => setAmount(e.target.value)}
                   />
                 </div>
-                <div className="info-box">
-                  Units will be calculated during checkout
-                </div>
+                <div className="info-box">Units will be calculated during checkout</div>
                 <div className="fg">
                   <label>Payment Method</label>
                   <select value={method} onChange={e => setMethod(e.target.value)}>
@@ -214,6 +201,9 @@ export default function MeterDetail() {
                     <option value="cash">Cash</option>
                   </select>
                 </div>
+                {purchaseError && (
+                  <div style={{ color: "var(--danger)", fontSize: "0.8rem" }}>{purchaseError}</div>
+                )}
                 <button
                   className="btn btn-primary"
                   style={{ width: "100%" }}
@@ -226,7 +216,6 @@ export default function MeterDetail() {
             )}
           </div>
 
-          {/* Recent purchases */}
           <div className="card" style={{ padding: "1.25rem" }}>
             <div className="detail-section-title">Recent Purchases</div>
             {transactions.length === 0 ? (
@@ -238,19 +227,14 @@ export default function MeterDetail() {
                 <div key={t.id} className="tx-row">
                   <div>
                     <div className="mono" style={{ fontSize: "0.75rem", color: "var(--text2)" }}>
-                      {t.token
-                        ? t.token.substring(0, 14) + "…"
-                        : "Failed"
-                      }
+                      {t.token ? t.token.substring(0, 14) + "…" : "Failed"}
                     </div>
                     <div style={{ fontSize: "0.68rem", color: "var(--text3)", marginTop: "0.1rem" }}>
                       {t.created_at?.substring(0, 10)}
                     </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                      {t.units_purchased} units
-                    </div>
+                    <div style={{ fontWeight: 600, fontSize: "0.8rem" }}>{t.units_purchased} units</div>
                     <span className={`badge ${t.status === "success" ? "badge-active" : "badge-low"}`}>
                       {t.status}
                     </span>

@@ -6,30 +6,39 @@ import "./Register.css"
 export default function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    username: "",
-    email: "",
-    phone_number: "",
-    password: "",
+    username: "", email: "", phone_number: "", password: "", confirm_password: ""
   })
-  const [error, setError] = useState("")
+  const [error, setError]     = useState("")
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+
+    if (form.password !== form.confirm_password) {
+      return setError("Passwords do not match.")
+    }
+    if (form.password.length < 8) {
+      return setError("Password must be at least 8 characters.")
+    }
+
     setLoading(true)
     try {
-      await api.post("/auth/register/", form)
-      navigate("/login")
+      await api.post("/auth/register/", {
+        username:     form.username,
+        email:        form.email,
+        phone_number: form.phone_number,
+        password:     form.password,
+      })
+      // Redirect to verify email page, passing email so it's pre-filled
+      navigate("/verify-email", { state: { email: form.email } })
     } catch (err) {
       const data = err.response?.data
-      if (data) {
-        const firstError = Object.values(data)[0]
-        setError(Array.isArray(firstError) ? firstError[0] : firstError)
+      if (data && typeof data === "object") {
+        const first = Object.values(data).flat()[0]
+        setError(typeof first === "string" ? first : "Registration failed.")
       } else {
         setError("Registration failed. Please try again.")
       }
@@ -42,7 +51,7 @@ export default function Register() {
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-logo">IngufuPay</h1>
-        <h2 className="auth-title">Create account</h2>
+        <h2 className="auth-title">Create Account</h2>
         <p className="auth-subtitle">Start managing your meters today</p>
 
         {error && <div className="auth-error">{error}</div>}
@@ -88,6 +97,17 @@ export default function Register() {
               value={form.password}
               onChange={handleChange}
               placeholder="Min 8 characters"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              name="confirm_password"
+              value={form.confirm_password}
+              onChange={handleChange}
+              placeholder="Repeat your password"
               required
             />
           </div>

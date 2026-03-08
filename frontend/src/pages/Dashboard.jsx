@@ -17,12 +17,7 @@ function getGreeting() {
 }
 
 function Skeleton({ width = "100%", height = "1rem", radius = "6px" }) {
-  return (
-    <div
-      className="skeleton"
-      style={{ width, height, borderRadius: radius }}
-    />
-  )
+  return <div className="skeleton" style={{ width, height, borderRadius: radius }} />
 }
 
 export default function Dashboard() {
@@ -58,18 +53,20 @@ export default function Dashboard() {
 
   useEffect(() => { fetchData() }, []) // eslint-disable-line
 
+  // status === "active" is the only active state
   const totalMeters  = meters.length
   const activeMeters = meters.filter(m => m.status === "active").length
-  const lowBalance   = meters.filter(m => m.is_low_balance && m.status !== "disabled")
+  // low balance: only active meters where is_low_balance is true
+  const lowBalance   = meters.filter(m => m.is_low_balance && m.status === "active")
 
   const now = new Date()
   const thisMonthSpent = transactions
     .filter(t => {
       const d = new Date(t.created_at)
       return (
-        d.getMonth() === now.getMonth() &&
+        d.getMonth()    === now.getMonth() &&
         d.getFullYear() === now.getFullYear() &&
-        t.status === "success"
+        t.status?.toLowerCase() === "success"
       )
     })
     .reduce((sum, t) => sum + parseFloat(t.amount_rwf ?? 0), 0)
@@ -81,9 +78,9 @@ export default function Dashboard() {
       .filter(t => {
         const td = new Date(t.created_at)
         return (
-          td.getMonth() === d.getMonth() &&
+          td.getMonth()    === d.getMonth() &&
           td.getFullYear() === d.getFullYear() &&
-          t.status === "success"
+          t.status?.toLowerCase() === "success"
         )
       })
       .reduce((sum, t) => sum + parseFloat(t.amount_rwf ?? 0), 0)
@@ -107,14 +104,14 @@ export default function Dashboard() {
       icon: CheckCircle,
       iconBg: "var(--success-light)",
       iconColor: "var(--success)",
-      hint: "Running normally",
-      hintColor: "var(--success)",
+      hint: activeMeters === totalMeters ? "All running" : `${totalMeters - activeMeters} inactive`,
+      hintColor: activeMeters === totalMeters ? "var(--success)" : "var(--warning)",
     },
     {
       label: "Low Balance",
       value: lowBalance.length,
       icon: AlertTriangle,
-      iconBg: "var(--danger-light)",
+      iconBg: lowBalance.length > 0 ? "var(--danger-light)" : "var(--success-light)",
       iconColor: lowBalance.length > 0 ? "var(--danger)" : "var(--success)",
       hint: lowBalance.length > 0 ? "Needs top up" : "All good",
       hintColor: lowBalance.length > 0 ? "var(--danger)" : "var(--success)",
@@ -200,7 +197,7 @@ export default function Dashboard() {
           ) : (
             <div className="chart-wrap">
               {chartData.map((d, i) => {
-                const pct = Math.round((d.total / maxVal) * 100)
+                const pct            = Math.round((d.total / maxVal) * 100)
                 const isCurrentMonth = i === chartData.length - 1
                 return (
                   <div key={i} className="bar-group">

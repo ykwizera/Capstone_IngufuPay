@@ -16,19 +16,19 @@ const CONTACT_INFO = [
   {
     icon: Mail,
     label: "Email Support",
-    value: "support@ingufupay.rw",
+    value: "y.kwizera@alustudent.com",
     sub: "We reply within 2 hours",
   },
   {
     icon: Phone,
     label: "Phone (Mon–Fri 8am–6pm)",
-    value: "+250 788 123 456",
+    value: "+250 784 494 644",
     sub: "For urgent issues",
   },
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "+250 788 123 456",
+    value: "+250 784 494 644",
     sub: "Quick responses",
   },
   {
@@ -43,9 +43,9 @@ export default function Support() {
   const [form, setForm] = useState({
     subject: "", category: "", message: ""
   })
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading]     = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [error, setError]       = useState("")
+  const [error, setError]         = useState("")
 
   const handleSubmit = async () => {
     if (!form.subject || !form.category || !form.message) {
@@ -54,12 +54,16 @@ export default function Support() {
     setLoading(true)
     setError("")
     try {
-      // Replace with your actual support endpoint when ready:
-      // await api.post("/support/", form)
-      await new Promise(r => setTimeout(r, 1000)) // simulate API call
+      await api.post("/support/", form)
       setSubmitted(true)
-    } catch {
-      setError("Failed to submit request. Please try again or contact us directly.")
+    } catch (err) {
+      const data = err.response?.data
+      if (data && typeof data === "object") {
+        const first = Object.values(data).flat()[0]
+        setError(typeof first === "string" ? first : "Failed to submit request.")
+      } else {
+        setError("Failed to submit request. Please try again or contact us directly.")
+      }
     } finally {
       setLoading(false)
     }
