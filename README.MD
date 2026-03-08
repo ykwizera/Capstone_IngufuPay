@@ -14,7 +14,7 @@ Yvette Kwizera
 
 ## Deployed Version
 
-**Frontend:** [https://capstoneingufupay.netlify.app](https://capstoneingufupay.netlify.app)
+**Frontend:** capstoneingufupay.netlify.app
 
 **Backend API:** [Deployment Link](#)
 
