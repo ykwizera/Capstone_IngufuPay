@@ -14,7 +14,7 @@ Yvette Kwizera
 
 ## Deployed Version
 
-**Frontend:** capstoneingufupay.netlify.app
+**Frontend:** [https://capstoneingufupay.netlify.app](https://capstoneingufupay.netlify.app)
 
 **Backend API:** [Deployment Link](#)
 
@@ -322,6 +322,72 @@ Dashboard shows live remaining units
             v
 When units reach zero - relay cuts power automatically
 ```
+
+---
+
+## Analysis of Results
+
+### What Was Achieved
+
+The core objectives of IngufuPay were fully achieved. The system successfully delivers a complete end-to-end electricity token management solution that covers user authentication, meter management, token purchasing, and real-time IoT integration.
+
+The token purchase flow works as intended. When a user purchases units, the balance is immediately updated in the database and the ESP32 retrieves the new units within 5 seconds through HTTP polling. The relay responds correctly, turning ON when units are available and cutting power automatically when units reach zero. This was tested and verified through both Postman API tests and live hardware testing with the ESP32 and a connected lamp.
+
+Authentication and security objectives were met. The system uses JWT tokens with a 30-minute access token lifetime, refresh token rotation, and token blacklisting on logout. Email OTP verification was implemented successfully for both registration and password reset, with all emails delivered through Gmail SMTP.
+
+The dashboard and notifications system works correctly. Remaining units update in real time as the ESP32 reports back every 10 seconds. Low balance alerts are triggered automatically when the meter balance drops below the configured threshold.
+
+### What Was Missed or Partially Achieved
+
+The mobile payment integration with MTN Mobile Money was not fully implemented in this version. The current system simulates a successful payment instead of processing a real MoMo transaction. This was due to the complexity of the MTN MoMo API and the time constraints of the project. The architecture is designed to support this in a future update.
+
+Current sensor calibration presented challenges during hardware testing. The EmonLib library requires precise calibration values for accurate power readings. With the available ACS712 sensor, the readings showed some variance at very low loads such as LED bulbs. This affects the accuracy of unit consumption tracking for small loads, though it performs reliably with larger loads.
+
+Backend deployment encountered Python version compatibility issues on both Railway and Render due to newer Python versions breaking certain dependencies. This was resolved by pinning the Python version to 3.11 in `runtime.txt`.
+
+---
+
+## Discussion
+
+### Importance of Milestones
+
+The project was structured around three key milestones that each built on the previous one.
+
+The first milestone was building a functional authentication and meter management system. This was critical because every other feature depends on users being able to securely register, verify their identity, and manage their meters. Without a solid foundation here, the IoT integration would have been impossible to secure properly.
+
+The second milestone was the token purchase flow and transaction history. This is the core business logic of the system. Getting the relationship between payments, tokens, and meter balances correct required careful design of the database models and serializers. The decision to use a OneToOne relationship between transactions and token purchases was important for ensuring data integrity.
+
+The third and most significant milestone was the ESP32 integration. This transformed IngufuPay from a simple web application into a real IoT system. The HTTP polling approach proved more reliable than MQTT for this use case because it does not require a separate broker and works well within the 5-second polling interval. The device token authentication system ensures that each ESP32 can only access its own meter, which is important for security in a multi-user environment.
+
+### Impact of Results
+
+The results demonstrate that a low-cost IoT solution using an ESP32 and a relay can be effectively integrated with a modern web application to deliver smart prepaid electricity management. The total hardware cost per meter is significantly lower than commercial smart meter solutions available in the Rwandan market.
+
+The system proved to be responsive and stable during testing. The 5-second polling interval provides a good balance between responsiveness and server load. For a production deployment serving many meters simultaneously, this interval could be adjusted per meter based on the server capacity.
+
+---
+
+## Recommendations
+
+### For the Community
+
+Electricity management is a real problem in Rwanda and across Africa where prepaid meters are the standard. IngufuPay demonstrates that it is possible to build a low-cost smart metering solution using affordable hardware and open-source software. Community organizations, cooperatives, and small landlords managing multiple rental units could benefit significantly from a system like this without needing to invest in expensive commercial smart meters.
+
+It is recommended that developers building similar systems consider HTTP polling over MQTT for simpler deployments, as it reduces infrastructure complexity and is easier to debug. The ESP32 is well-suited for this type of application given its built-in WiFi, low cost, and wide availability in Rwanda.
+
+### Future Work
+
+The following features are recommended for future development of IngufuPay:
+
+MTN Mobile Money integration should be the first priority. Rwanda has one of the highest mobile money penetration rates in Africa and the majority of electricity purchases happen via MoMo. Integrating the MTN MoMo API would make IngufuPay fully functional as a commercial product.
+
+A mobile application built with React Native would significantly improve accessibility. Most users in Rwanda access the internet primarily through mobile phones and a dedicated mobile app would provide a better experience than a mobile browser.
+
+SMS notifications via a service such as Africa's Talking would ensure users receive low balance alerts even without an internet connection, which is important for reliability in areas with intermittent connectivity.
+
+Multi-tariff support would allow the system to apply different rates at different times of day, enabling time-of-use pricing which can help users reduce their electricity costs by shifting consumption to off-peak hours.
+
+Over-the-air firmware updates for the ESP32 would allow the system to push improvements to deployed devices without requiring physical access, which is essential for managing a large number of meters across different locations.
 
 ---
 
