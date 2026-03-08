@@ -18,6 +18,8 @@ Yvette Kwizera
 
 **Backend API:** [Deployment Link](#)
 
+**Demo video:** https://drive.google.com/file/d/1y8fnAaH4JOxU4RL54BmZZyaKzkPvBowJ/view?usp=sharing
+
 ---
 
 ## Tech Stack
