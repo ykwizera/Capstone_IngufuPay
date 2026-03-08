@@ -14,7 +14,9 @@ Yvette Kwizera
 
 ## Deployed Version
 
-[Deployment Link](#)
+**Frontend:** [https://capstoneingufupay.netlify.app](https://capstoneingufupay.netlify.app)
+
+**Backend API:** [Deployment Link](#)
 
 ---
 
@@ -105,7 +107,8 @@ Make sure you have the following installed on your machine:
 ### Step 1 - Clone the repository
 
 ```bash
-git clone https://github.com/ykwizera/Capstone_IngufuPay.git
+git clone https://github.com/your-username/Capstone-draft.git
+cd Capstone-draft
 ```
 
 ---
