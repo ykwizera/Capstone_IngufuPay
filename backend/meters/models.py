@@ -9,7 +9,7 @@ class Meter(models.Model):
         INACTIVE = "inactive", "Inactive"
         DISABLED = "disabled", "Disabled"
 
-    owner = models.ForeignKey(
+    owner                 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="meters"
@@ -18,20 +18,22 @@ class Meter(models.Model):
     name                  = models.CharField(max_length=100)
     location              = models.CharField(max_length=255, blank=True, null=True)
     status                = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.ACTIVE
+        max_length=10, choices=Status.choices, default=Status.ACTIVE
     )
     low_balance_threshold = models.DecimalField(
         max_digits=10, decimal_places=2,
-        default=5,
-        validators=[MinValueValidator(0)]
+        default=5, validators=[MinValueValidator(0)]
     )
     current_balance_units = models.DecimalField(
         max_digits=12, decimal_places=3,
-        default=0,
-        validators=[MinValueValidator(0)]
+        default=0, validators=[MinValueValidator(0)]
     )
+
+    # ESP32 integration fields
+    device_id    = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    device_token = models.CharField(max_length=64,  blank=True, null=True)
+    last_seen    = models.DateTimeField(blank=True,  null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,7 +60,6 @@ class Meter(models.Model):
 
     @property
     def is_low_balance(self):
-        # Only flag low balance if threshold is above 0 and balance is at or below it
         if self.low_balance_threshold <= 0:
             return False
         return self.current_balance_units <= self.low_balance_threshold
