@@ -4,11 +4,14 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-#=n@krl5qi##mavo@zc_cgv99_w(5yd$%sa*b&i^vf90^2bkor'
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-#=n@krl5qi##mavo@zc_cgv99_w(5yd$%sa*b&i^vf90^2bkor")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "192.168.1.84"]
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost,192.168.1.84"
+).split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'corsheaders',
+    'whitenoise',
 
     'users',
     'meters',
@@ -33,6 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,11 +68,11 @@ WSGI_APPLICATION = 'ingufupay.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'ingufupay_db',
-        'USER':     'ingufupay_user',
-        'PASSWORD': 'kwizzy',
-        'HOST':     'localhost',
-        'PORT':     '5432',
+        'NAME':     os.environ.get("PGDATABASE", "ingufupay_db"),
+        'USER':     os.environ.get("PGUSER",     "ingufupay_user"),
+        'PASSWORD': os.environ.get("PGPASSWORD", "kwizzy"),
+        'HOST':     os.environ.get("PGHOST",     "localhost"),
+        'PORT':     os.environ.get("PGPORT",     "5432"),
     }
 }
 
@@ -83,9 +88,12 @@ TIME_ZONE     = 'Africa/Kigali'
 USE_I18N      = True
 USE_TZ        = True
 
-STATIC_URL  = 'static/'
-MEDIA_URL   = '/media/'
-MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
+STATIC_URL   = '/static/'
+STATIC_ROOT  = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL    = '/media/'
+MEDIA_ROOT   = os.path.join(BASE_DIR, 'media')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -120,12 +128,14 @@ EMAIL_BACKEND       = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST          = "smtp.gmail.com"
 EMAIL_PORT          = 587
 EMAIL_USE_TLS       = True
-EMAIL_HOST_USER     = "y.kwizera@alustudent.com"
-EMAIL_HOST_PASSWORD = "obsc mbds whec rous"
-DEFAULT_FROM_EMAIL  = "IngufuPay <y.kwizera@alustudent.com>"
+EMAIL_HOST_USER     = os.environ.get("EMAIL_HOST_USER",     "y.kwizera@alustudent.com")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "obsc mbds whec rous")
+DEFAULT_FROM_EMAIL  = os.environ.get("DEFAULT_FROM_EMAIL",  "IngufuPay <y.kwizera@alustudent.com>")
 
 # ── CORS ───────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173"
+).split(",")
+
+CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
