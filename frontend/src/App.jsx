@@ -3,6 +3,7 @@ import { ThemeProvider } from "./context/ThemeContext"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
 
+import Landing from "./pages/Landing"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import VerifyEmail from "./pages/VerifyEmail"
@@ -23,7 +24,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/"                element={<Navigate to="/login" />} />
+          <Route path="/"                element={<Landing />} />
           <Route path="/login"           element={<Login />} />
           <Route path="/register"        element={<Register />} />
           <Route path="/verify-email"    element={<VerifyEmail />} />
@@ -49,7 +50,7 @@ function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

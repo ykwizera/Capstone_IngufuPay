@@ -10,7 +10,7 @@
   background: var(--danger-light); color: var(--danger);
   border: 1px solid var(--danger); border-radius: var(--radius);
   padding: 0.75rem 1rem; font-size: 0.82rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.25rem; flex-wrap: wrap;
 }
 
 /* Layout */
@@ -109,6 +109,7 @@
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.85rem; background: var(--surface2);
   border-radius: 9px; border: 1px solid var(--border);
+  gap: 1rem;
 }
 .dt-label { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .dt-sub   { font-size: 0.72rem; color: var(--text3); margin-top: 0.15rem; }
@@ -142,11 +143,77 @@
 /* Skeleton */
 .profile-skeleton {
   display: flex; align-items: center; gap: 1.5rem;
-  padding: 1.5rem;
+  padding: 1.5rem; flex-wrap: wrap;
+}
+
+/* Mobile section tabs */
+.p-tabs {
+  display: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: 0.4rem;
+  padding-bottom: 0.25rem;
+  margin-bottom: 1rem;
+  scrollbar-width: none;
+}
+.p-tabs::-webkit-scrollbar { display: none; }
+.p-tab-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.85rem; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: 'Sora', sans-serif; font-size: 0.75rem;
+  font-weight: 500; color: var(--text2);
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.15s;
+}
+.p-tab-btn.active {
+  background: var(--primary); color: #fff;
+  border-color: var(--primary);
+}
+.p-tab-btn.danger.active {
+  background: var(--danger); border-color: var(--danger);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .profile-layout { grid-template-columns: 1fr; }
-  .form-row.three { grid-template-columns: 1fr; }
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Hide sidebar menu on mobile, show tabs instead */
+  .profile-sidebar-card {
+    padding: 1.25rem;
+  }
+  .p-menu {
+    display: none;
+  }
+  .p-tabs {
+    display: flex;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-row.three {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-sidebar-card {
+    padding: 1rem;
+  }
+  .form-card {
+    padding: 1rem;
+  }
+  .dark-toggle {
+    flex-direction: row;
+    align-items: center;
+  }
 }

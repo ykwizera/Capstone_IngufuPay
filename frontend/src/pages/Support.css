@@ -59,6 +59,7 @@
 .support-info-val {
   font-size: 0.85rem; font-weight: 600; color: var(--text);
   margin-bottom: 0.1rem;
+  word-break: break-word;
 }
 .support-info-sub {
   font-size: 0.7rem; color: var(--text3);
@@ -75,5 +76,48 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .support-grid { grid-template-columns: 1fr; }
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack contact info horizontally on tablet */
+  .support-info-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Single column on phone */
+  .support-info-list {
+    grid-template-columns: 1fr;
+  }
+
+  .support-info-item {
+    padding: 0.75rem;
+  }
+
+  .support-success {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }

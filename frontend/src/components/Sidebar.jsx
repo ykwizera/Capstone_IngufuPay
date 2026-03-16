@@ -37,7 +37,7 @@ export default function Sidebar({ collapsed, onToggle, unreadCount = 0 }) {
       })
     }
     localStorage.clear()
-    navigate("/login")
+    navigate("/")
   }
 
   return (

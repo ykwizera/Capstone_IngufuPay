@@ -81,7 +81,6 @@ export default function Profile() {
     setTimeout(() => setSuccess(""), 3000)
   }
 
-  // Save account info
   const saveAccount = async () => {
     setSaving(true); setError(null)
     try {
@@ -101,7 +100,6 @@ export default function Profile() {
     } finally { setSaving(false) }
   }
 
-  // Save address
   const saveAddress = async () => {
     setSaving(true); setError(null)
     try {
@@ -119,7 +117,6 @@ export default function Profile() {
     } finally { setSaving(false) }
   }
 
-  // Change password
   const changePassword = async () => {
     if (!security.current_password || !security.new_password) {
       return setError("Please fill in all password fields.")
@@ -144,14 +141,12 @@ export default function Profile() {
     } finally { setSaving(false) }
   }
 
-  // Avatar upload
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
     const reader = new FileReader()
     reader.onload = ev => setAvatarSrc(ev.target.result)
     reader.readAsDataURL(file)
-
     try {
       const formData = new FormData()
       formData.append("avatar", file)
@@ -187,23 +182,33 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Success banner */}
-      {success && (
-        <div className="profile-success">{success}</div>
-      )}
-
-      {/* Error banner */}
+      {success && <div className="profile-success">{success}</div>}
       {error && (
         <div className="profile-error">
           <WifiOff size={15} /> {error}
         </div>
       )}
 
+      {/* Mobile tabs */}
+      <div className="p-tabs">
+        {SECTIONS.map(s => {
+          const Icon = s.icon
+          return (
+            <button
+              key={s.key}
+              className={`p-tab-btn${section === s.key ? " active" : ""}${s.danger ? " danger" : ""}`}
+              onClick={() => { setSection(s.key); setError(null); setSuccess("") }}
+            >
+              <Icon size={13} /> {s.label}
+            </button>
+          )
+        })}
+      </div>
+
       <div className="profile-layout">
 
         {/* Sidebar card */}
         <div className="profile-sidebar-card">
-          {/* Avatar */}
           <div className="avatar-wrap">
             <div className="avatar-img">
               {avatarSrc
@@ -230,7 +235,6 @@ export default function Profile() {
             <div className="p-phone">{account.phone_number}</div>
           )}
 
-          {/* Section menu */}
           <div className="p-menu">
             {SECTIONS.map(s => {
               const Icon = s.icon
@@ -250,7 +254,6 @@ export default function Profile() {
         {/* Content area */}
         <div className="profile-content">
 
-          {/* Account Info */}
           {section === "account" && (
             <div className="form-card">
               <div className="fc-title">Account Information</div>
@@ -286,11 +289,7 @@ export default function Profile() {
                 </div>
               </div>
               <div className="form-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={saveAccount}
-                  disabled={saving}
-                >
+                <button className="btn btn-primary" onClick={saveAccount} disabled={saving}>
                   <Save size={14} />
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
@@ -298,7 +297,6 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Address */}
           {section === "address" && (
             <div className="form-card">
               <div className="fc-title">Address Information</div>
@@ -364,11 +362,7 @@ export default function Profile() {
                 />
               </div>
               <div className="form-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={saveAddress}
-                  disabled={saving}
-                >
+                <button className="btn btn-primary" onClick={saveAddress} disabled={saving}>
                   <Save size={14} />
                   {saving ? "Saving..." : "Save Address"}
                 </button>
@@ -376,7 +370,6 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Security */}
           {section === "security" && (
             <div className="form-card">
               <div className="fc-title">Change Password</div>
@@ -410,11 +403,7 @@ export default function Profile() {
                 </div>
               </div>
               <div className="form-actions">
-                <button
-                  className="btn btn-secondary"
-                  onClick={changePassword}
-                  disabled={saving}
-                >
+                <button className="btn btn-secondary" onClick={changePassword} disabled={saving}>
                   <Lock size={14} />
                   {saving ? "Updating..." : "Update Password"}
                 </button>
@@ -422,7 +411,6 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Appearance */}
           {section === "appearance" && (
             <div className="form-card">
               <div className="fc-title">Appearance</div>
@@ -432,18 +420,13 @@ export default function Profile() {
                   <div className="dt-sub">Switch between light and dark interface</div>
                 </div>
                 <label className="dt-switch">
-                  <input
-                    type="checkbox"
-                    checked={isDark}
-                    onChange={toggleTheme}
-                  />
+                  <input type="checkbox" checked={isDark} onChange={toggleTheme} />
                   <span className="dt-slider" />
                 </label>
               </div>
             </div>
           )}
 
-          {/* Danger zone */}
           {section === "danger" && (
             <div className="form-card danger-card">
               <div className="fc-title danger-title">Danger Zone</div>
@@ -451,10 +434,7 @@ export default function Profile() {
                 Deleting your account is permanent. All your meters, transactions,
                 and data will be removed and cannot be recovered.
               </p>
-              <button
-                className="btn btn-danger"
-                onClick={() => setShowDelete(true)}
-              >
+              <button className="btn btn-danger" onClick={() => setShowDelete(true)}>
                 <Trash2 size={14} /> Delete My Account
               </button>
             </div>

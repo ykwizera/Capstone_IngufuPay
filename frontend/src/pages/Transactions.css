@@ -4,7 +4,7 @@
   background: var(--danger-light); color: var(--danger);
   border: 1px solid var(--danger); border-radius: var(--radius);
   padding: 0.75rem 1rem; font-size: 0.82rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.25rem; flex-wrap: wrap;
 }
 
 /* Toolbar */
@@ -41,6 +41,7 @@
   background: var(--surface2);
   color: var(--text);
   transition: border-color 0.15s;
+  max-width: 140px;
 }
 .filter-group input:focus,
 .filter-group select:focus { border-color: var(--primary); }
@@ -48,7 +49,7 @@
 /* Actions */
 .tx-actions {
   display: flex; align-items: center; gap: 0.5rem;
-  flex-shrink: 0;
+  flex-shrink: 0; flex-wrap: wrap;
 }
 .tx-count {
   font-size: 0.75rem; color: var(--text3);
@@ -79,9 +80,62 @@
 .tx-empty-title { font-size: 1rem; font-weight: 600; color: var(--text); }
 .tx-empty-sub   { font-size: 0.82rem; color: var(--text3); }
 
+/* Table wrapper — horizontal scroll on small screens */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.table-wrap table {
+  min-width: 640px;
+  width: 100%;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .tx-toolbar  { flex-direction: column; align-items: flex-start; }
-  .tx-filters  { flex-direction: column; align-items: flex-start; }
-  .tx-actions  { width: 100%; justify-content: space-between; }
+  .tx-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tx-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-group {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .filter-group input,
+  .filter-group select {
+    flex: 1;
+    max-width: 100%;
+  }
+  .tx-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .dl-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .tx-count {
+    width: 100%;
+    text-align: center;
+  }
 }
