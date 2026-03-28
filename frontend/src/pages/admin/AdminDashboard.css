@@ -1,0 +1,143 @@
+/* Stats grid */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+.admin-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.admin-stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.85rem;
+}
+.admin-stat-icon-blue   { background: #eff6ff; color: #2563eb; }
+.admin-stat-icon-cyan   { background: #ecfeff; color: #0891b2; }
+.admin-stat-icon-green  { background: #f0fdf4; color: #16a34a; }
+.admin-stat-icon-orange { background: #fffbeb; color: #d97706; }
+.admin-stat-icon-red    { background: #fef2f2; color: #dc2626; }
+.admin-stat-icon-gray   { background: var(--surface2); color: var(--text3); }
+
+.admin-stat-blue   { border-left: 3px solid #2563eb; }
+.admin-stat-cyan   { border-left: 3px solid #0891b2; }
+.admin-stat-green  { border-left: 3px solid #16a34a; }
+.admin-stat-orange { border-left: 3px solid #d97706; }
+.admin-stat-red    { border-left: 3px solid #dc2626; }
+.admin-stat-gray   { border-left: 3px solid var(--border2); }
+
+.admin-stat-value {
+  font-size: 1.5rem; font-weight: 800;
+  color: var(--text); font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 0.2rem;
+}
+.admin-stat-label {
+  font-size: 0.75rem; color: var(--text3); font-weight: 500;
+}
+
+/* Section title */
+.admin-section-title {
+  font-size: 0.82rem; font-weight: 700;
+  color: var(--text); margin-bottom: 0.85rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.admin-section-title::before {
+  content: "";
+  width: 3px; height: 14px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+/* Empty */
+.admin-empty {
+  text-align: center;
+  padding: 2.5rem;
+  color: var(--text3);
+  font-size: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* Filter bar */
+.admin-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.admin-filter-group {
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.admin-filter-group label {
+  font-size: 0.72rem; color: var(--text3);
+  font-weight: 500; white-space: nowrap;
+}
+.admin-filter-group select,
+.admin-filter-group input {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.78rem;
+  font-family: 'Sora', sans-serif;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  max-width: 160px;
+}
+.admin-filter-group select:focus,
+.admin-filter-group input:focus { border-color: var(--primary); }
+
+/* Action row */
+.admin-action-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap; gap: 0.75rem;
+}
+
+/* Detail modal overrides */
+.admin-detail-row {
+  display: flex; justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  gap: 1rem;
+}
+.admin-detail-row:last-child { border-bottom: none; }
+.admin-detail-row span { color: var(--text3); white-space: nowrap; }
+.admin-detail-row strong { color: var(--text); text-align: right; }
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .admin-stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-filters { flex-direction: column; align-items: stretch; }
+  .admin-filter-group { justify-content: space-between; }
+  .admin-filter-group select,
+  .admin-filter-group input { max-width: 100%; flex: 1; }
+}
+@media (max-width: 480px) {
+  .admin-stats-grid { grid-template-columns: 1fr 1fr; }
+}

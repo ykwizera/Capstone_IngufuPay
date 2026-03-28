@@ -5,12 +5,6 @@ import "./Topbar.css"
 
 const PAGE_META = {
   "/dashboard":     { title: "Dashboard",    sub: "Overview of your account" },
-  "/meters":        { title: "Meters",       sub: "Manage your electricity meters" },
-  "/buy-token":     { title: "Buy Token",    sub: "Purchase electricity tokens" },
-  "/transactions":  { title: "Transactions", sub: "Purchase history" },
-  "/notifications": { title: "Notifications",sub: "Alerts and updates" },
-  "/profile":       { title: "Profile",      sub: "Account settings" },
-  "/support":       { title: "Support",      sub: "Get help from our team" },
 }
 
 export default function Topbar({ unreadCount = 0 }) {

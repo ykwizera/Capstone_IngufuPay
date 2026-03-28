@@ -1,27 +1,45 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { LayoutGrid, List, Plus, RefreshCw, WifiOff } from "lucide-react"
+import { LayoutGrid, List, Plus, RefreshCw, WifiOff, Clock, CheckCircle, XCircle } from "lucide-react"
 import api from "../api/axios"
 import MeterCard from "../components/MeterCard"
-import AddMeterModal from "../components/AddMeterModal"
+import RequestMeterModal from "../components/RequestMeterModal"
 import "./Meters.css"
+
+const STATUS_ICON = {
+  pending:  <Clock size={13} />,
+  approved: <CheckCircle size={13} />,
+  rejected: <XCircle size={13} />,
+}
+const STATUS_CLASS = {
+  pending:  "badge-pending",
+  approved: "badge-active",
+  rejected: "badge-low",
+}
 
 export default function Meters() {
   const navigate = useNavigate()
-  const [meters, setMeters]       = useState([])
-  const [loading, setLoading]     = useState(true)
+  const [meters, setMeters]         = useState([])
+  const [requests, setRequests]     = useState([])
+  const [loading, setLoading]       = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [error, setError]         = useState(null)
-  const [view, setView]           = useState("cards")
-  const [showModal, setShowModal] = useState(false)
+  const [error, setError]           = useState(null)
+  const [view, setView]             = useState("cards")
+  const [showModal, setShowModal]   = useState(false)
 
-  const fetchMeters = async (showRefresh = false) => {
+  const fetchData = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true)
     else setLoading(true)
     setError(null)
     try {
-      const res = await api.get("/meters/")
-      setMeters(res.data.results ?? res.data)
+      const [mRes, rRes] = await Promise.all([
+        api.get("/meters/"),
+        api.get("/meter-requests/"),
+      ])
+      setMeters(mRes.data.results ?? mRes.data)
+      // Only keep pending and rejected — approved are hidden permanently
+      const all = rRes.data.results ?? rRes.data
+      setRequests(all.filter(r => r.status !== "approved"))
     } catch (err) {
       if (err.response?.status === 401) navigate("/login")
       else setError("Failed to load meters. Check your connection and try again.")
@@ -31,7 +49,7 @@ export default function Meters() {
     }
   }
 
-  useEffect(() => { fetchMeters() }, []) // eslint-disable-line
+  useEffect(() => { fetchData() }, []) // eslint-disable-line
 
   const handleDisable = async (id) => {
     try {
@@ -51,6 +69,22 @@ export default function Meters() {
     }
   }
 
+  const handleRemoveRequest = async (id, isPending) => {
+    const msg = isPending
+      ? "Cancel this meter request?"
+      : "Dismiss this rejected request?"
+    if (!window.confirm(msg)) return
+    try {
+      await api.delete(`/meter-requests/${id}/`)
+      setRequests(prev => prev.filter(r => r.id !== id))
+    } catch {
+      alert("Failed to remove request.")
+    }
+  }
+
+  const pendingRequests  = requests.filter(r => r.status === "pending")
+  const rejectedRequests = requests.filter(r => r.status === "rejected")
+
   return (
     <div className="page page-enter">
       <div className="page-header">
@@ -63,46 +97,96 @@ export default function Meters() {
         <div style={{ display: "flex", gap: "0.65rem" }}>
           <button
             className="btn btn-secondary btn-sm"
-            onClick={() => fetchMeters(true)}
+            onClick={() => fetchData(true)}
             disabled={refreshing}
           >
             <RefreshCw size={14} className={refreshing ? "spin" : ""} />
             {refreshing ? "Refreshing…" : "Refresh"}
           </button>
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={15} /> Add Meter
+            <Plus size={15} /> Request Meter
           </button>
         </div>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="meters-error">
           <WifiOff size={15} />
           {error}
-          <button className="btn btn-secondary btn-xs" onClick={() => fetchMeters()}>Retry</button>
+          <button className="btn btn-secondary btn-xs" onClick={() => fetchData()}>Retry</button>
         </div>
       )}
 
-      {/* Toolbar */}
-      <div className="meters-toolbar">
-        <div className="view-toggle">
-          <button
-            className={view === "cards" ? "active" : ""}
-            onClick={() => setView("cards")}
-          >
-            <LayoutGrid size={14} /> Cards
-          </button>
-          <button
-            className={view === "list" ? "active" : ""}
-            onClick={() => setView("list")}
-          >
-            <List size={14} /> List
-          </button>
+      {pendingRequests.length > 0 && (
+        <div className="meters-requests-banner">
+          <Clock size={15} />
+          <span>
+            You have <strong>{pendingRequests.length}</strong> pending meter
+            request{pendingRequests.length > 1 ? "s" : ""} awaiting admin approval.
+          </span>
         </div>
-      </div>
+      )}
 
-      {/* Loading skeleton */}
+      {rejectedRequests.length > 0 && (
+        <div className="meters-requests-rejected">
+          <XCircle size={15} />
+          <span>
+            <strong>{rejectedRequests.length}</strong> request
+            {rejectedRequests.length > 1 ? "s were" : " was"} rejected. Check details below.
+          </span>
+        </div>
+      )}
+
+      {requests.length > 0 && (
+        <div className="meters-requests-section">
+          <div className="meters-requests-title">Meter Requests</div>
+          <div className="meters-requests-list">
+            {requests.map(r => (
+              <div key={r.id} className={`meters-request-item meters-request-${r.status}`}>
+                <div className="meters-request-left">
+                  <span className={`badge ${STATUS_CLASS[r.status]}`} style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", whiteSpace: "nowrap" }}>
+                    {STATUS_ICON[r.status]} {r.status}
+                  </span>
+                  <div className="meters-request-info">
+                    <div className="meters-request-location">
+                      {r.village}, {r.cell}, {r.sector}, {r.district}, {r.province}
+                    </div>
+                    <div className="meters-request-date">
+                      Submitted {r.created_at?.substring(0, 10)}
+                    </div>
+                    {r.rejection_reason && (
+                      <div className="meters-request-rejection">
+                        Reason: {r.rejection_reason}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button
+                  className="btn btn-secondary btn-xs"
+                  onClick={() => handleRemoveRequest(r.id, r.status === "pending")}
+                  style={{ color: "var(--danger)", flexShrink: 0 }}
+                >
+                  {r.status === "pending" ? "Cancel" : "Dismiss"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {meters.length > 0 && (
+        <div className="meters-toolbar">
+          <div className="view-toggle">
+            <button className={view === "cards" ? "active" : ""} onClick={() => setView("cards")}>
+              <LayoutGrid size={14} /> Cards
+            </button>
+            <button className={view === "list" ? "active" : ""} onClick={() => setView("list")}>
+              <List size={14} /> List
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="meters-grid">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -119,20 +203,22 @@ export default function Meters() {
         <div className="meters-empty">
           <div className="meters-empty-icon">⚡</div>
           <div className="meters-empty-title">No meters yet</div>
-          <div className="meters-empty-sub">Add your first electricity meter to get started</div>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={15} /> Add Meter
-          </button>
+          <div className="meters-empty-sub">
+            {pendingRequests.length > 0
+              ? "Your meter request is pending approval. You will be notified once approved."
+              : "Submit a meter request to get started"
+            }
+          </div>
+          {pendingRequests.length === 0 && (
+            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+              <Plus size={15} /> Request Meter
+            </button>
+          )}
         </div>
       ) : view === "cards" ? (
         <div className="meters-grid">
           {meters.map(m => (
-            <MeterCard
-              key={m.id}
-              meter={m}
-              onDisable={handleDisable}
-              onEnable={handleEnable}
-            />
+            <MeterCard key={m.id} meter={m} onDisable={handleDisable} onEnable={handleEnable} />
           ))}
         </div>
       ) : (
@@ -140,12 +226,8 @@ export default function Meters() {
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Meter No.</th>
-                <th>Location</th>
-                <th>Balance</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Name</th><th>Meter No.</th><th>Location</th>
+                <th>Balance</th><th>Status</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -159,10 +241,7 @@ export default function Meters() {
                   </td>
                   <td className="mono" style={{ fontSize: "0.75rem" }}>{m.meter_number}</td>
                   <td style={{ color: "var(--text2)" }}>{m.location || "—"}</td>
-                  <td
-                    className="mono"
-                    style={{ color: m.is_low_balance ? "var(--danger)" : "var(--text)" }}
-                  >
+                  <td className="mono" style={{ color: m.is_low_balance ? "var(--danger)" : "var(--text)" }}>
                     {m.current_balance_units} units
                   </td>
                   <td>
@@ -173,27 +252,15 @@ export default function Meters() {
                   <td>
                     <div style={{ display: "flex", gap: "0.4rem" }}>
                       {m.status !== "disabled" && (
-                        <button
-                          className="btn btn-primary btn-xs"
-                          onClick={() => navigate(`/meters/${m.id}`)}
-                        >
-                          View
-                        </button>
+                        <button className="btn btn-primary btn-xs"
+                          onClick={() => navigate(`/meters/${m.id}`)}>View</button>
                       )}
                       {m.status === "disabled" ? (
-                        <button
-                          className="btn btn-secondary btn-xs"
-                          onClick={() => handleEnable(m.id)}
-                        >
-                          Enable
-                        </button>
+                        <button className="btn btn-secondary btn-xs"
+                          onClick={() => handleEnable(m.id)}>Enable</button>
                       ) : (
-                        <button
-                          className="btn btn-secondary btn-xs"
-                          onClick={() => handleDisable(m.id)}
-                        >
-                          Disable
-                        </button>
+                        <button className="btn btn-secondary btn-xs"
+                          onClick={() => handleDisable(m.id)}>Disable</button>
                       )}
                     </div>
                   </td>
@@ -204,11 +271,10 @@ export default function Meters() {
         </div>
       )}
 
-      {/* Add meter modal */}
       {showModal && (
-        <AddMeterModal
+        <RequestMeterModal
           onClose={() => setShowModal(false)}
-          onAdded={newMeter => setMeters(prev => [...prev, newMeter])}
+          onSubmitted={() => fetchData()}
         />
       )}
     </div>

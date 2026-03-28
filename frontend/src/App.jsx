@@ -17,6 +17,14 @@ import Transactions from "./pages/Transactions"
 import Notifications from "./pages/Notifications"
 import Profile from "./pages/Profile"
 import Support from "./pages/Support"
+import AdminProtectedRoute from "./components/AdminProtectedRoute"
+import AdminLayout from "./components/AdminLayout"
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import AdminRequests from "./pages/admin/AdminRequests"
+import AdminUsers from "./pages/admin/AdminUsers"
+import AdminMeters from "./pages/admin/AdminMeters"
+import AdminTransactions from "./pages/admin/AdminTransactions"
+import AdminSettings from "./pages/admin/AdminSettings"
 
 function App() {
   return (
@@ -31,7 +39,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password"  element={<ResetPassword />} />
 
-          {/* Protected routes — wrapped in Layout */}
+          {/* Protected user routes */}
           <Route
             element={
               <ProtectedRoute>
@@ -47,6 +55,24 @@ function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile"       element={<Profile />} />
             <Route path="/support"       element={<Support />} />
+          </Route>
+
+          {/* Admin routes */}
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminLayout />
+              </AdminProtectedRoute>
+            }
+          >
+            <Route index                element={<Navigate to="/admin/dashboard" />} />
+            <Route path="dashboard"     element={<AdminDashboard />} />
+            <Route path="requests"      element={<AdminRequests />} />
+            <Route path="users"         element={<AdminUsers />} />
+            <Route path="meters"        element={<AdminMeters />} />
+            <Route path="transactions"  element={<AdminTransactions />} />
+            <Route path="settings"      element={<AdminSettings />} />
           </Route>
 
           {/* Catch all */}

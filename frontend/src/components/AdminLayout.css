@@ -1,0 +1,36 @@
+.admin-sidebar .brand-icon.admin-brand-icon {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+}
+
+.admin-topbar {
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow);
+}
+.admin-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.admin-topbar-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.admin-topbar-right {}
+.admin-topbar-user {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+}

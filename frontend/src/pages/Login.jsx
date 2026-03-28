@@ -22,7 +22,19 @@ export default function Login() {
       localStorage.setItem("access_token", res.data.access)
       localStorage.setItem("refresh_token", res.data.refresh)
       localStorage.setItem("username", form.username)
-      navigate("/dashboard")
+
+      // Fetch user profile to get role
+      const meRes = await api.get("/auth/me/", {
+        headers: { Authorization: `Bearer ${res.data.access}` }
+      })
+      localStorage.setItem("role", meRes.data.role)
+
+      // Redirect based on role
+      if (meRes.data.role === "admin" || meRes.data.is_staff) {
+        navigate("/admin/dashboard")
+      } else {
+        navigate("/dashboard")
+      }
     } catch (err) {
       setError("Invalid username or password.")
     } finally {
@@ -70,7 +82,7 @@ export default function Login() {
         <p className="auth-link">
           Don't have an account? <Link to="/register">Register</Link>
         </p>
-        <p className="auth-link">  
+        <p className="auth-link">
           <Link to="/forgot-password">Forgot password?</Link>
         </p>
       </div>

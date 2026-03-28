@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import {
   LayoutDashboard, Zap, ShoppingCart, ClipboardList,
-  Bell, User, MessageCircle, LogOut, ChevronLeft, ChevronRight
+  Bell, User, MessageCircle, LogOut, ChevronLeft, ChevronRight,
+  ShieldCheck
 } from "lucide-react"
 import "./Sidebar.css"
 
@@ -26,8 +27,10 @@ const NAV_ITEMS = [
 ]
 
 export default function Sidebar({ collapsed, onToggle, unreadCount = 0 }) {
-  const navigate  = useNavigate()
-  const location  = useLocation()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const role     = localStorage.getItem("role")
+  const isAdmin  = role === "admin" || role === "staff"
 
   const handleLogout = () => {
     const refresh = localStorage.getItem("refresh_token")
@@ -82,6 +85,21 @@ export default function Sidebar({ collapsed, onToggle, unreadCount = 0 }) {
             })}
           </div>
         ))}
+
+        {/* Admin Panel link — only visible to admin users */}
+        {isAdmin && (
+          <div>
+            <div className="nav-section">Admin</div>
+            <button
+              className={`nav-btn${location.pathname.startsWith("/admin") ? " active" : ""}`}
+              onClick={() => navigate("/admin/dashboard")}
+              title={collapsed ? "Admin Panel" : undefined}
+            >
+              <span className="nav-icon"><ShieldCheck size={17} /></span>
+              <span className="nav-label">Admin Panel</span>
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Footer */}
