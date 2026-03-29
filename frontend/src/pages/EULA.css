@@ -1,0 +1,147 @@
+.eula-page {
+  min-height: 100vh;
+  background: var(--bg, #f0f4ff);
+  padding: 2rem 1rem;
+}
+.eula-container {
+  max-width: 780px;
+  margin: 0 auto;
+  background: var(--surface, #fff);
+  border-radius: 16px;
+  border: 1px solid var(--border, #e5e9f2);
+  box-shadow: 0 4px 24px rgba(37,99,235,0.06);
+  overflow: hidden;
+}
+
+/* Header */
+.eula-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border, #e5e9f2);
+  background: var(--surface2, #f8faff);
+}
+.eula-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.8rem;
+  color: var(--text2, #4b5563);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1rem;
+  transition: color 0.15s;
+}
+.eula-back:hover { color: var(--primary, #2563eb); }
+.eula-title-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.eula-icon {
+  width: 46px; height: 46px;
+  background: var(--primary-light, #eff6ff);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary, #2563eb);
+  flex-shrink: 0;
+}
+.eula-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text, #0c1220);
+}
+.eula-sub {
+  font-size: 0.75rem;
+  color: var(--text3, #9ca3af);
+  margin-top: 0.2rem;
+}
+
+/* Body */
+.eula-body {
+  padding: 2rem;
+}
+.eula-notice {
+  background: var(--primary-light, #eff6ff);
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  font-size: 0.82rem;
+  color: var(--primary, #2563eb);
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+}
+
+/* Sections */
+.eula-section {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border, #e5e9f2);
+}
+.eula-section:last-of-type { border-bottom: none; }
+.eula-section-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text, #0c1220);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.eula-section-title::before {
+  content: "";
+  width: 3px; height: 14px;
+  background: var(--primary, #2563eb);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.eula-section p {
+  font-size: 0.82rem;
+  color: var(--text2, #4b5563);
+  line-height: 1.7;
+  margin-bottom: 0.65rem;
+}
+.eula-section p:last-child { margin-bottom: 0; }
+.eula-section ul {
+  margin: 0.5rem 0 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.eula-section ul li {
+  font-size: 0.82rem;
+  color: var(--text2, #4b5563);
+  line-height: 1.65;
+}
+
+/* Contact block */
+.eula-contact {
+  margin-top: 0.65rem;
+  background: var(--surface2, #f8faff);
+  border: 1px solid var(--border, #e5e9f2);
+  border-radius: 9px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--text2, #4b5563);
+}
+
+/* Footer note */
+.eula-footer-note {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text3, #9ca3af);
+  font-style: italic;
+  line-height: 1.65;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border, #e5e9f2);
+}
+
+@media (max-width: 600px) {
+  .eula-body { padding: 1.25rem; }
+  .eula-header { padding: 1.25rem; }
+}

@@ -120,3 +120,28 @@
 }
 
 .auth-link a:hover { text-decoration: underline; }
+
+.terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.terms-row input[type="checkbox"] {
+  margin-top: 2px;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+.terms-row label {
+  cursor: pointer;
+}
+.terms-row a {
+  color: #2563eb;
+  text-decoration: underline;
+}

@@ -25,6 +25,7 @@ import AdminUsers from "./pages/admin/AdminUsers"
 import AdminMeters from "./pages/admin/AdminMeters"
 import AdminTransactions from "./pages/admin/AdminTransactions"
 import AdminSettings from "./pages/admin/AdminSettings"
+import EULA from "./pages/EULA"
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/verify-email"    element={<VerifyEmail />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password"  element={<ResetPassword />} />
+          <Route path="/terms" element={<EULA />} />
 
           {/* Protected user routes */}
           <Route

@@ -174,12 +174,13 @@ export default function Landing() {
           </div>
         </div>
         <div className="landing-footer-bottom">
-          <span>2026 IngufuPay. Capstone project — African Leadership University.</span>
-          <div className="landing-footer-links">
-            <button className="landing-btn-ghost landing-btn-sm" onClick={() => navigate("/login")}>Sign in</button>
-            <button className="landing-btn-ghost landing-btn-sm" onClick={() => navigate("/register")}>Register</button>
-          </div>
-        </div>
+  <span>2026 IngufuPay. Capstone project — African Leadership University.</span>
+  <div className="landing-footer-links">
+    <button className="landing-btn-ghost landing-btn-sm" onClick={() => navigate("/terms")}>Terms &amp; Conditions</button>
+    <button className="landing-btn-ghost landing-btn-sm" onClick={() => navigate("/login")}>Sign in</button>
+    <button className="landing-btn-ghost landing-btn-sm" onClick={() => navigate("/register")}>Register</button>
+  </div>
+</div>
       </footer>
 
     </div>

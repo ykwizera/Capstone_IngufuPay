@@ -8,6 +8,7 @@ export default function Register() {
   const [form, setForm] = useState({
     username: "", email: "", phone_number: "", password: "", confirm_password: ""
   })
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError]     = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +24,9 @@ export default function Register() {
     if (form.password.length < 8) {
       return setError("Password must be at least 8 characters.")
     }
+    if (!agreedToTerms) {
+      return setError("You must agree to the Terms & Conditions to create an account.")
+    }
 
     setLoading(true)
     try {
@@ -32,7 +36,6 @@ export default function Register() {
         phone_number: form.phone_number,
         password:     form.password,
       })
-      // Redirect to verify email page, passing email so it's pre-filled
       navigate("/verify-email", { state: { email: form.email } })
     } catch (err) {
       const data = err.response?.data
@@ -111,7 +114,24 @@ export default function Register() {
               required
             />
           </div>
-          <button type="submit" className="auth-btn" disabled={loading}>
+
+          {/* Terms checkbox */}
+          <div className="terms-row">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+            />
+            <label htmlFor="terms">
+              I have read and agree to the{" "}
+              <Link to="/terms" target="_blank" rel="noopener noreferrer">
+                Terms &amp; Conditions
+              </Link>
+            </label>
+          </div>
+
+          <button type="submit" className="auth-btn" disabled={loading || !agreedToTerms}>
             {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
