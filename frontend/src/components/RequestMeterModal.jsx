@@ -23,6 +23,7 @@ export default function RequestMeterModal({ onClose, onSubmitted }) {
   const [form, setForm] = useState({
     full_name:      "",
     id_number:      "",
+    meter_name:     "",
     reason:         "new_connection",
     reason_details: "",
     province:       "",
@@ -64,6 +65,7 @@ export default function RequestMeterModal({ onClose, onSubmitted }) {
   const validateStep1 = () => {
     if (!form.full_name.trim()) return "Full name is required."
     if (!form.id_number.trim()) return "ID number is required."
+    if (!form.meter_name.trim()) return "Please give your meter a name."
     return ""
   }
 
@@ -166,7 +168,14 @@ export default function RequestMeterModal({ onClose, onSubmitted }) {
                 />
               </div>
             </div>
-
+            <div className="fg rm-field">
+              <label>Meter Name <span className="rm-req">*</span></label>
+             <input
+                 placeholder="e.g. Home, Shop, Office, Bedroom"
+                 value={form.meter_name}
+               onChange={e => set("meter_name", e.target.value)}
+               />
+            </div>
             <div className="fg rm-field">
               <label>Reason for Request <span className="rm-req">*</span></label>
               <select value={form.reason} onChange={e => set("reason", e.target.value)}>
@@ -294,6 +303,9 @@ export default function RequestMeterModal({ onClose, onSubmitted }) {
               <div className="rm-success-details">
                 <div className="rm-success-detail-row">
                   <span>Name</span><strong>{form.full_name}</strong>
+                </div>
+                <div className="rm-success-detail-row">
+                  <span>Meter Name</span><strong>{form.meter_name}</strong>
                 </div>
                 <div className="rm-success-detail-row">
                   <span>Location</span>

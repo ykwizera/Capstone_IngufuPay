@@ -17,6 +17,7 @@ class Meter(models.Model):
     meter_number          = models.CharField(max_length=30, unique=True)
     name                  = models.CharField(max_length=100)
     location              = models.CharField(max_length=255, blank=True, null=True)
+    meter_name = models.CharField(max_length=100, blank=True, default="My Meter")
 
     # Rwanda location fields
     province = models.CharField(max_length=50, blank=True)
@@ -24,6 +25,7 @@ class Meter(models.Model):
     sector   = models.CharField(max_length=50, blank=True)
     cell     = models.CharField(max_length=50, blank=True)
     village  = models.CharField(max_length=50, blank=True)
+    
 
     status                = models.CharField(
         max_length=10, choices=Status.choices, default=Status.ACTIVE

@@ -139,7 +139,7 @@ class AdminMeterRequestDetailView(APIView):
             meter = Meter.objects.create(
                 owner        = user,
                 meter_number = meter_number,
-                name         = f"{meter_request.full_name}'s Meter",
+                name         = meter_request.meter_name,
                 province     = meter_request.province,
                 district     = meter_request.district,
                 sector       = meter_request.sector,
