@@ -10,7 +10,7 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
-    "127.0.0.1,localhost,192.168.1.84"
+    "127.0.0.1,localhost,192.168.1.141"
 ).split(",")
 
 INSTALLED_APPS = [

@@ -160,7 +160,7 @@ class AdminMeterRequestDetailView(APIView):
                 from notifications.models import Notification
                 Notification.objects.create(
                     user    = user,
-                    title   = "Meter Request Approved ✅",
+                    title   = "Meter Request Approved",
                     message = (
                         f"Your meter request has been approved! "
                         f"Your meter number is {meter_number}. "

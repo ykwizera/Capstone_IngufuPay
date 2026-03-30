@@ -18,7 +18,7 @@ class MeterRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model  = MeterRequest
         fields = [
-            "id", "full_name", "id_number", "meter_name", "reason", "reason_details",
+            "id", "full_name", "id_number", "reason", "reason_details",
             "province", "district", "sector", "cell", "village",
             "status", "rejection_reason", "meter_number",
             "created_at", "reviewed_at", "reviewed_by",
@@ -154,7 +154,6 @@ class MeterRequestDetailView(APIView):
         except MeterRequest.DoesNotExist:
             return Response({"detail": "Not found."}, status=404)
 
-        # Approved requests cannot be deleted — they are linked to a real meter
         if r.status == "approved":
             return Response(
                 {"detail": "Approved requests cannot be deleted."},
