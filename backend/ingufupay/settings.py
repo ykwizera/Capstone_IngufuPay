@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -66,14 +67,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ingufupay.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     os.environ.get("PGDATABASE", "ingufupay_db"),
-        'USER':     os.environ.get("PGUSER",     "ingufupay_user"),
-        'PASSWORD': os.environ.get("PGPASSWORD", "kwizzy"),
-        'HOST':     os.environ.get("PGHOST",     "localhost"),
-        'PORT':     os.environ.get("PGPORT",     "5432"),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
