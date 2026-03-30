@@ -1,15 +1,18 @@
 from pathlib import Path
+from dotenv import load_dotenv
 from datetime import timedelta
 import os
 import dj_database_url
 
+load_dotenv()  # Load environment variables from .env file
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-#=n@krl5qi##mavo@zc_cgv99_w(5yd$%sa*b&i^vf90^2bkor")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-#=n@krl5qi##mavo@zc_cgv99_w(5yd$%sa*b&i^vf90^2bkor")
 
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get(
+ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
     "127.0.0.1,localhost,192.168.1.141"
 ).split(",")
@@ -68,7 +71,7 @@ WSGI_APPLICATION = 'ingufupay.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
+        default=os.getenv('DATABASE_URL'),
         conn_max_age=600,
     )
 }
@@ -125,14 +128,14 @@ EMAIL_BACKEND       = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST          = "smtp.gmail.com"
 EMAIL_PORT          = 587
 EMAIL_USE_TLS       = True
-EMAIL_HOST_USER     = os.environ.get("EMAIL_HOST_USER",     "y.kwizera@alustudent.com")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "obsc mbds whec rous")
-DEFAULT_FROM_EMAIL  = os.environ.get("DEFAULT_FROM_EMAIL",  "IngufuPay <y.kwizera@alustudent.com>")
+EMAIL_HOST_USER     = os.getenv("EMAIL_HOST_USER",     "y.kwizera@alustudent.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "obsc mbds whec rous")
+DEFAULT_FROM_EMAIL  = os.getenv("DEFAULT_FROM_EMAIL",  "IngufuPay <y.kwizera@alustudent.com>")
 
 # ── CORS ───────────────────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = os.environ.get(
+CORS_ALLOWED_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:5173,http://127.0.0.1:5173"
 ).split(",")
 
-CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
