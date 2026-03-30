@@ -1,231 +1,139 @@
-/* Modal size */
-.rm-modal {
-  max-width: 520px;
-  width: 100%;
-  padding: 0;
-  overflow: hidden;
-}
+.rm-modal { max-width: 520px; width: 100%; padding: 0; overflow: hidden; }
 
-/* Header */
 .rm-header-content {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  display: flex; align-items: center; gap: 0.75rem;
 }
 .rm-header-icon {
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   background: var(--primary-light);
   border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 1rem;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary); font-weight: 700; font-size: 1rem; flex-shrink: 0;
 }
-.rm-step-label {
-  font-size: 0.72rem;
-  color: var(--text3);
-  margin-top: 0.1rem;
-}
+.rm-step-label { font-size: 0.72rem; color: var(--text3); margin-top: 0.1rem; }
 
-/* Progress */
-.rm-progress-wrap {
-  padding: 0 1.75rem 0.25rem;
-}
+.rm-progress-wrap { padding: 0 1.75rem 0.25rem; }
 .rm-progress-track {
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 0.6rem;
+  height: 3px; background: var(--border); border-radius: 2px;
+  overflow: hidden; margin-bottom: 0.6rem;
 }
 .rm-progress-fill {
-  height: 100%;
-  background: var(--primary);
-  border-radius: 2px;
+  height: 100%; background: var(--primary); border-radius: 2px;
   transition: width 0.35s ease;
 }
-.rm-steps-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
+.rm-steps-row { display: flex; align-items: center; }
 .rm-step-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--surface2);
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text3);
-  transition: all 0.2s;
-  flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--surface2); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 700; color: var(--text3);
+  transition: all 0.2s; flex-shrink: 0;
 }
-.rm-step-dot.done {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-}
-.rm-step-line {
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
+.rm-step-dot.done { background: var(--primary); border-color: var(--primary); color: #fff; }
+.rm-step-line { flex: 1; height: 1px; background: var(--border); }
 
-/* Error */
 .rm-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--danger-light);
-  color: var(--danger);
-  border: 1px solid var(--danger);
-  border-radius: var(--radius);
-  padding: 0.6rem 1rem;
-  font-size: 0.8rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--danger-light); color: var(--danger);
+  border: 1px solid var(--danger); border-radius: var(--radius);
+  padding: 0.6rem 1rem; font-size: 0.8rem;
   margin: 0.5rem 1.75rem 0;
 }
 .rm-error-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--danger);
-  border-radius: 50%;
-  flex-shrink: 0;
+  width: 6px; height: 6px; background: var(--danger);
+  border-radius: 50%; flex-shrink: 0;
 }
 
-/* Body */
-.rm-body {
-  padding: 1.25rem 1.75rem 1.5rem;
-}
+.rm-body { padding: 1.25rem 1.75rem 1.5rem; }
 
-/* Section label */
 .rm-section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: var(--primary-light);
-  padding: 0.3rem 0.75rem;
-  border-radius: 6px;
-  margin-bottom: 1.1rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.68rem; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--primary-light); padding: 0.3rem 0.75rem;
+  border-radius: 6px; margin-bottom: 1.1rem;
 }
 
-/* Required star */
 .rm-req { color: var(--danger); margin-left: 2px; }
 .rm-optional { color: var(--text3); font-weight: 400; font-size: 0.7rem; }
-
-/* Field spacing */
 .rm-field { margin-bottom: 0.85rem; }
 
-/* Disabled select styling */
-.fg select:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: var(--surface2);
-}
+.fg select:disabled { opacity: 0.5; cursor: not-allowed; background: var(--surface2); }
 
-/* Note box */
-.rm-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
+/* Rate preview box */
+.rm-rate-preview {
+  display: flex; align-items: flex-start; gap: 0.6rem;
   background: var(--warning-light);
   border: 1px solid var(--warning);
   border-radius: var(--radius);
   padding: 0.75rem 0.9rem;
-  font-size: 0.78rem;
-  color: var(--text2);
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  font-size: 0.8rem; color: var(--text2);
+  line-height: 1.55; margin-bottom: 0.85rem;
 }
-.rm-note svg { color: var(--warning); margin-top: 1px; }
+.rm-rate-preview strong { color: var(--text); }
+.rm-rate-tiers {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.rm-rate-tiers span {
+  font-size: 0.72rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.15rem 0.5rem;
+  color: var(--text2);
+}
 
-/* Footer */
+.rm-note {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  background: var(--primary-light); border: 1px solid #bfdbfe;
+  border-radius: var(--radius); padding: 0.75rem 0.9rem;
+  font-size: 0.78rem; color: var(--primary);
+  line-height: 1.6; margin-bottom: 1rem;
+}
+
 .rm-footer {
-  display: flex;
-  gap: 0.65rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border);
+  display: flex; gap: 0.65rem;
+  padding-top: 0.5rem; border-top: 1px solid var(--border);
   margin-top: 0.25rem;
 }
 .rm-footer .btn { flex: 1; justify-content: center; }
 
-/* Success state */
 .rm-success {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-  text-align: center;
-  padding: 0.5rem 0 0.25rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.85rem;
+  text-align: center; padding: 0.5rem 0 0.25rem;
 }
 .rm-success-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--success-light);
-  border: 2px solid var(--success);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  color: var(--success);
-  font-weight: 700;
+  width: 60px; height: 60px;
+  background: var(--success-light); border: 2px solid var(--success);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: var(--success); font-weight: 700;
 }
-.rm-success-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--success);
-}
+.rm-success-title { font-size: 1.05rem; font-weight: 700; color: var(--success); }
 .rm-success-sub {
-  font-size: 0.8rem;
-  color: var(--text2);
-  line-height: 1.65;
-  max-width: 340px;
+  font-size: 0.8rem; color: var(--text2);
+  line-height: 1.65; max-width: 340px;
 }
 .rm-success-details {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.85rem 1rem;
-  margin: 0.25rem 0 0.5rem;
+  width: 100%; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0.85rem 1rem; margin: 0.25rem 0 0.5rem;
 }
 .rm-success-detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.78rem;
-  padding: 0.3rem 0;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.78rem; padding: 0.3rem 0;
   border-bottom: 1px solid var(--border);
 }
 .rm-success-detail-row:last-child { border-bottom: none; }
 .rm-success-detail-row span { color: var(--text3); }
 .rm-success-detail-row strong { color: var(--text); text-align: right; max-width: 60%; }
 
-/* Responsive */
 @media (max-width: 540px) {
-  .rm-modal {
-    max-width: 100%;
-    margin: 0;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
+  .rm-modal { max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: fixed; bottom: 0; left: 0; right: 0; }
   .form-row { grid-template-columns: 1fr; }
   .rm-body { padding: 1.1rem 1.25rem 1.25rem; }
   .rm-progress-wrap { padding: 0 1.25rem 0.25rem; }
+  .rm-rate-tiers { flex-direction: column; }
 }

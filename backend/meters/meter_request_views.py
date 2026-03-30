@@ -18,7 +18,7 @@ class MeterRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model  = MeterRequest
         fields = [
-            "id", "full_name", "id_number", "reason", "reason_details",
+            "id", "full_name", "id_number", "reason", "reason_details", "category",
             "province", "district", "sector", "cell", "village",
             "status", "rejection_reason", "meter_number",
             "created_at", "reviewed_at", "reviewed_by",

@@ -10,8 +10,7 @@ from .serializers import PurchaseTokenSerializer, TokenPurchaseSerializer, Payme
 from .utils import generate_unique_token
 from notifications.models import Notification
 from ingufupay.pagination import StandardPagination
-
-PRICE_PER_UNIT_RWF = Decimal("100.00")
+from transactions.reg_tariffs import calculate_units, get_effective_rate, get_category_display
 
 
 class TransactionListView(APIView):
@@ -48,6 +47,7 @@ class PurchaseTokenView(APIView):
 
     @transaction.atomic
     def post(self, request):
+        # 1) Validate input
         serializer = PurchaseTokenSerializer(
             data=request.data,
             context={"request": request}
@@ -59,8 +59,13 @@ class PurchaseTokenView(APIView):
         method  = serializer.validated_data["method"]
         ext_ref = serializer.validated_data.get("external_reference")
 
+        # 2) Lock meter row
         meter = meter.__class__.objects.select_for_update().get(pk=meter.pk)
 
+        # 3) Get meter category for REG pricing
+        category = getattr(meter, "category", "residential") or "residential"
+
+        # 4) Create payment as PENDING
         payment = PaymentTransaction.objects.create(
             user=request.user,
             meter=meter,
@@ -70,12 +75,21 @@ class PurchaseTokenView(APIView):
             external_reference=ext_ref
         )
 
+        # 5) Mark as SUCCESS
         payment.status = PaymentTransaction.Status.SUCCESS
         payment.save(update_fields=["status"])
 
-        units = (amount / PRICE_PER_UNIT_RWF).quantize(Decimal("0.001"))
+        # 6) Calculate units using REG tariff
+        units = calculate_units(
+            amount_rwf=amount,
+            category=category,
+            current_balance=meter.current_balance_units
+        )
+
+        # 7) Generate token
         token = generate_unique_token(TokenPurchase)
 
+        # 8) Create token purchase record
         token_purchase = TokenPurchase.objects.create(
             payment=payment,
             meter=meter,
@@ -84,10 +98,15 @@ class PurchaseTokenView(APIView):
             status=TokenPurchase.Status.DELIVERED
         )
 
+        # 9) Update meter balance
         meter.current_balance_units = (
             meter.current_balance_units + units
         ).quantize(Decimal("0.001"))
         meter.save(update_fields=["current_balance_units", "updated_at"])
+
+        # 10) Notifications
+        effective_rate   = get_effective_rate(category, meter.current_balance_units)
+        category_display = get_category_display(category)
 
         Notification.objects.create(
             user=request.user,
@@ -95,8 +114,9 @@ class PurchaseTokenView(APIView):
             notification_type=Notification.Type.PAYMENT,
             title="Token Purchase Successful",
             message=(
-                f"You purchased {units} units for meter {meter.meter_number}. "
-                f"Token: {token}. New balance: {meter.current_balance_units} units."
+                f"You purchased {units} kWh for meter {meter.meter_number}. "
+                f"Rate: {effective_rate} FRW/kWh ({category_display}). "
+                f"Token: {token}. New balance: {meter.current_balance_units} kWh."
             )
         )
 
@@ -108,10 +128,11 @@ class PurchaseTokenView(APIView):
                 title="Low Balance Alert",
                 message=(
                     f"Your meter '{meter.name}' is low on units. "
-                    f"Remaining: {meter.current_balance_units} units."
+                    f"Remaining: {meter.current_balance_units} kWh."
                 )
             )
 
+        # 11) Return response
         return Response(
             {
                 "payment_id":        str(payment.id),
@@ -120,6 +141,8 @@ class PurchaseTokenView(APIView):
                 "units":             str(token_purchase.units_generated),
                 "new_balance_units": str(meter.current_balance_units),
                 "low_balance":       meter.is_low_balance,
+                "rate_frw_per_kwh":  str(effective_rate),
+                "category":          category_display,
             },
             status=status.HTTP_201_CREATED
         )

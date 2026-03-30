@@ -140,6 +140,7 @@ class AdminMeterRequestDetailView(APIView):
                 owner        = user,
                 meter_number = meter_number,
                 name         = meter_request.meter_name,
+                category     = meter_request.category,
                 province     = meter_request.province,
                 district     = meter_request.district,
                 sector       = meter_request.sector,

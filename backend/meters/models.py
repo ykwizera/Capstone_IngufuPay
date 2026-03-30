@@ -2,6 +2,22 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
 
+CATEGORY_CHOICES = [
+    ("residential",      "Residential (Household)"),
+    ("non_residential",  "Non-Residential"),
+    ("health",           "Health Facility"),
+    ("school",           "School / Higher Learning Institution"),
+    ("hotel_small",      "Hotel (annual consumption < 660,000 kWh)"),
+    ("hotel_large",      "Hotel (annual consumption >= 660,000 kWh)"),
+    ("commercial",       "Commercial / Data Centre"),
+    ("water_pumping",    "Water Pumping Station"),
+    ("water_treatment",  "Water Treatment Plant"),
+    ("telecom",          "Telecom Tower"),
+    ("industry_small",   "Industry - Small (5,000-100,000 kWh/yr)"),
+    ("industry_medium",  "Industry - Medium (100,000-1,000,000 kWh/yr)"),
+    ("industry_large",   "Industry - Large (>=1,000,000 kWh/yr)"),
+]
+
 
 class Meter(models.Model):
     class Status(models.TextChoices):
@@ -9,14 +25,20 @@ class Meter(models.Model):
         INACTIVE = "inactive", "Inactive"
         DISABLED = "disabled", "Disabled"
 
-    owner                 = models.ForeignKey(
+    owner        = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="meters"
     )
-    meter_number          = models.CharField(max_length=30, unique=True)
-    name                  = models.CharField(max_length=100)
-    location              = models.CharField(max_length=255, blank=True, null=True)
+    meter_number = models.CharField(max_length=30, unique=True)
+    name         = models.CharField(max_length=100)
+    location     = models.CharField(max_length=255, blank=True, null=True)
+    category     = models.CharField(
+        max_length=30,
+        choices=CATEGORY_CHOICES,
+        default="residential",
+        help_text="REG tariff category — determines price per kWh"
+    )
 
     # Rwanda location fields
     province = models.CharField(max_length=50, blank=True)
@@ -90,10 +112,10 @@ class MeterRequest(models.Model):
         REJECTED = "rejected", "Rejected"
 
     class Reason(models.TextChoices):
-        NEW_CONNECTION  = "new_connection",  "New Connection"
-        REPLACEMENT     = "replacement",     "Replacement"
-        ADDITIONAL      = "additional",      "Additional Meter"
-        OTHER           = "other",           "Other"
+        NEW_CONNECTION = "new_connection", "New Connection"
+        REPLACEMENT    = "replacement",    "Replacement"
+        ADDITIONAL     = "additional",     "Additional Meter"
+        OTHER          = "other",          "Other"
 
     user       = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -102,7 +124,13 @@ class MeterRequest(models.Model):
     )
     full_name  = models.CharField(max_length=150)
     id_number  = models.CharField(max_length=20)
-    meter_name = models.CharField(max_length=100, blank=True, default="My Meter")  # ← here
+    meter_name = models.CharField(max_length=100, blank=True, default="My Meter")
+    category   = models.CharField(
+        max_length=30,
+        choices=CATEGORY_CHOICES,
+        default="residential",
+        help_text="REG tariff category"
+    )
     reason     = models.CharField(
         max_length=20, choices=Reason.choices, default=Reason.NEW_CONNECTION
     )
@@ -149,7 +177,6 @@ class MeterRequest(models.Model):
         return f"{self.full_name} - {self.province} [{self.status}]"
 
     def assign_meter_number(self):
-        """Auto-generate next meter number for the province."""
         prefix = PROVINCE_PREFIX.get(self.province, "RWA")
         last = Meter.objects.filter(
             meter_number__startswith=prefix
