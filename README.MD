@@ -16,7 +16,7 @@ Yvette Kwizera
 
 **Frontend:** https://getpowereasierwithingufupay.netlify.app/
 
-**Backend API:** [Deployment Link](#)
+**Backend API:** https://capstone-ingufupay-1.onrender.com
 
 **Demo video:** https://drive.google.com/file/d/1y8fnAaH4JOxU4RL54BmZZyaKzkPvBowJ/view?usp=sharing
 
